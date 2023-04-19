@@ -30,7 +30,14 @@ if os.environ.get('RWKV_CUDA_ON') == '1':
         name=f"wkv_cuda",
         sources=[f"{current_path}/cuda/wrapper.cpp", f"{current_path}/cuda/operators.cu"],
         verbose=True,
-        extra_cuda_cflags=["-t 4", "-std=c++17", "--use_fast_math", "-O3", "--extra-device-vectorization"],
+        extra_cuda_cflags=[
+        # "-t 4", 
+        "-std=c++17", 
+        # "--use_fast_math", 
+        "-ffast-math", 
+        "-O3", 
+        # "--extra-device-vectorization"
+        ],
         is_python_module=False)
 
     @MyStatic

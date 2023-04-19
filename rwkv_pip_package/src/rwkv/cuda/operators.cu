@@ -46,7 +46,7 @@ __global__ void kernel_wkv_forward(const int B, const int T, const int C,
 }
 
 void cuda_wkv_forward(int B, int T, int C, float *w, float *u, fp16 *k, fp16 *v, fp16 *y, float *aa, float *bb, float *pp) {
-    dim3 threadsPerBlock( min(C, 32) );
+    dim3 threadsPerBlock( std::min(C, 32) );
     assert(B * C % threadsPerBlock.x == 0);
     dim3 numBlocks(B * C / threadsPerBlock.x);
     kernel_wkv_forward<<<numBlocks, threadsPerBlock>>>(B, T, C, w, u, k, v, y, aa, bb, pp);
@@ -108,8 +108,8 @@ __global__ void kernel_mm8_one(
     float *__restrict__ const y) {
 
     const int k = blockIdx.y * blockDim.y + threadIdx.y;
-    const int j0 = min(N, blockIdx.x * ((N + MM8_ONE_JSPLIT - 1) / MM8_ONE_JSPLIT));
-    const int j1 = min(N, (blockIdx.x + 1) * ((N + MM8_ONE_JSPLIT - 1) / MM8_ONE_JSPLIT));
+    const int j0 = std::min<int>(N, blockIdx.x * ((N + MM8_ONE_JSPLIT - 1) / MM8_ONE_JSPLIT));
+    const int j1 = std::min<int>(N, (blockIdx.x + 1) * ((N + MM8_ONE_JSPLIT - 1) / MM8_ONE_JSPLIT));
 
     if (k < M) {
         float y_local = 0;
