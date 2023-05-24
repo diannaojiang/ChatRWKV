@@ -13,6 +13,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 import uuid
 from cryptography.fernet import Fernet
 import io
+import base64
 
 ########################################################################################################
 
@@ -108,7 +109,7 @@ class RWKV(MyModule):
             with open(args.MODEL_NAME, 'rb') as fr:
                 encrypted_data = fr.read()
             mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
-            key = mac[:-1]
+            key = base64.urlsafe_b64encode(mac[:-1])
             decrypted_data = Fernet(key).decrypt(encrypted_data)
             b = io.BytesIO(decrypted_data)
             b.seek(0)
