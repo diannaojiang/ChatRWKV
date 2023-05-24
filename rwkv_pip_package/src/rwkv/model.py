@@ -10,10 +10,8 @@ torch.backends.cudnn.allow_tf32 = True
 torch.backends.cuda.matmul.allow_tf32 = True
 current_path = os.path.dirname(os.path.abspath(__file__))
 
-import uuid
 from cryptography.fernet import Fernet
 import io
-import base64
 
 ########################################################################################################
 
@@ -80,7 +78,7 @@ else:
 ########################################################################################################
 
 class RWKV(MyModule):
-    def __init__(self, model, strategy, verbose = True, convert_and_save_and_exit = None):
+    def __init__(self, model, strategy, verbose = True, convert_and_save_and_exit = None, key=None):
         super().__init__()
         if verbose:
             prxxx = lambda *args, **kwargs: print(*args, **kwargs)
@@ -108,10 +106,6 @@ class RWKV(MyModule):
         with torch.no_grad():
             with open(args.MODEL_NAME, 'rb') as fr:
                 encrypted_data = fr.read()
-            mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
-            print("device mac:",mac)
-            key = base64.urlsafe_b64encode(('cssailab2023shuizhenz'+mac[:-1]).encode())
-            print("device key:",key)
             decrypted_data = Fernet(key).decrypt(encrypted_data)
             b = io.BytesIO(decrypted_data)
             b.seek(0)
