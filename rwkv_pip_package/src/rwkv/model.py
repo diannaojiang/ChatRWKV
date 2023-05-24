@@ -109,7 +109,9 @@ class RWKV(MyModule):
             with open(args.MODEL_NAME, 'rb') as fr:
                 encrypted_data = fr.read()
             mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
-            key = base64.urlsafe_b64encode(mac[:-1])
+            print("device mac:",mac)
+            key = base64.urlsafe_b64encode(('cssailab2023shuizhenz'+mac[:-1]).encode())
+            print("device key:",key)
             decrypted_data = Fernet(key).decrypt(encrypted_data)
             b = io.BytesIO(decrypted_data)
             b.seek(0)
