@@ -10,6 +10,10 @@ torch.backends.cudnn.allow_tf32 = True
 torch.backends.cuda.matmul.allow_tf32 = True
 current_path = os.path.dirname(os.path.abspath(__file__))
 
+import uuid
+from cryptography.fernet import Fernet
+import io
+
 ########################################################################################################
 
 if os.environ.get('RWKV_JIT_ON') != '0':
@@ -101,7 +105,14 @@ class RWKV(MyModule):
             args.MODEL_NAME += '.pth'
         prxxx(f'Loading {args.MODEL_NAME} ...')
         with torch.no_grad():
-            self.w = torch.load(args.MODEL_NAME, map_location='cpu') # load model to CPU first
+            with open(args.MODEL_NAME, 'rb') as fr:
+                encrypted_data = fr.read()
+            mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
+            key = mac[:-1]
+            decrypted_data = Fernet(key).decrypt(encrypted_data)
+            b = io.BytesIO(decrypted_data)
+            b.seek(0)
+            self.w = torch.load(b, map_location='cpu') # load model to CPU first
             gc.collect()
             w = self.w
 
