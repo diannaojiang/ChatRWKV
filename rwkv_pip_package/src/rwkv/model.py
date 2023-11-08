@@ -469,7 +469,14 @@ class RWKV(MyModule):
             if self.version == 5.2 and os.environ["RWKV_CUDA_ON"] == '1':
                 HEAD_SIZE = args.n_att // args.n_head
                 rwkv5 = load(name="rwkv5", sources=[f"{current_path}/cuda/rwkv5_op.cpp", f"{current_path}/cuda/rwkv5.cu"],
-                                verbose=True, extra_cuda_cflags=["-res-usage", "--use_fast_math", "-O3", "-Xptxas -O3" if os.name != "nt" else "", "--extra-device-vectorization", f"-D_N_={HEAD_SIZE}"])
+                                verbose=True, extra_cuda_cflags=[
+                                    # "-res-usage", 
+                                    # "--use_fast_math", 
+                                    "-ffast-math", 
+                                    "-O3", 
+                                    "-Xptxas -O3" if os.name != "nt" else "", 
+                                    # "--extra-device-vectorization", 
+                                    f"-D_N_={HEAD_SIZE}"])
 
                 class RWKV_5(torch.autograd.Function):
                     @staticmethod
